@@ -1,0 +1,56 @@
+---
+
+# jdk install
+
+- name: check if the jdk is already installed
+  stat: path=/usr/lib/jdk1.6.0_45/bin/java
+  register: java_intalled
+
+- debug: msg="java is already installed"
+  when: java_intalled.stat.isreg is defined and java_intalled.stat.isreg
+
+- name: Copy the jdk bin
+  copy: src=jdk-6u45-linux-x64.bin dest=/usr/lib mode=0755
+  when: java_intalled.stat.isreg is not defined
+
+- name: extract the jdk
+  command: ./jdk-6u45-linux-x64.bin chdir=/usr/lib
+  when: java_intalled.stat.isreg is not defined
+
+- name: delete jdk archive
+  file: path=/usr/lib/jdk-6u45-linux-x64.bin state=absent
+
+- name: create symlink for java bin
+  file: src=/usr/lib/jdk1.6.0_45/bin/java dest=/usr/bin/java state=link force=yes
+
+# Jboss AS 5.1.0GA
+
+#- name: create jboss group
+#  group: name=jboss state=present
+#
+#- name: create jboss user
+#  user: name=jboss state=present shell=/bin/bash group=jboss
+#
+#- name: check if jboss is already installed
+#  stat: path=/usr/share/jboss-5.1.0.GA/bin/run.jar
+#  register: jboss_intalled
+#
+#- debug: msg="Jboss is already installed"
+#  when: jboss_intalled.stat.isreg is defined and jboss_intalled.stat.isreg
+#
+#- name: install unzip package for unarchive module
+#  apt: name=unzip state=present update_cache=yes
+#  when: jboss_intalled.stat.isreg is not defined
+#
+#- name: copy and extract jboss
+#  unarchive: src=jboss-5.1.0.GA.zip dest=/usr/share mode=0755
+#  when: jboss_intalled.stat.isreg is not defined
+#
+#- name: set owner/group to jboss
+#  file: path=/usr/share/jboss-5.1.0.GA owner=jboss group=jboss recurse=yes
+#
+#- name: create symlink for jboss
+#  file: src=/usr/share/jboss-5.1.0.GA dest=/usr/share/jboss state=link force=yes owner=jboss group=jboss
+
+  
+

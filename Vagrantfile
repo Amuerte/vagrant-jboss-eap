@@ -14,7 +14,7 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "amuerte/fedora-22-x64"
+  config.vm.box = "fedora-cloud-22"
   #config.vm.box_url = "file://D:/devhome/workspaces/vm/repository/debian-8.0-x64.box"
 
   # Disable automatic box update checking. If you disable this, then
@@ -37,7 +37,27 @@ Vagrant.configure(2) do |config|
       vbmaster.memory = "512"
       vbmaster.cpus = "1"
     end
+
+    # Unsecure : Copying auth files 
+    master.vm.provision "file", source: "provisioning_file/vagrant", destination: "/home/vagrant/.ssh/id_dsa"
+    master.vm.provision "file", source: "provisioning_file/known_hosts", destination: "/home/vagrant/.ssh/known_hosts"
+
+    # Run the ansible playbook from the master
+    master.vm.provision "shell", path: "provisioning_shell/provisioner.sh", privileged: false
     
+  end
+
+  # Configuration for the provisioned machine
+  config.vm.define "node" do |node|
+    node.vm.network "private_network", ip: "192.168.56.34"
+    config.vm.hostname = "satan"
+
+    node.vm.provider "virtualbox" do |vbnode|
+      vbnode.check_guest_additions = false
+      vbnode.functional_vboxsf = false
+      vbnode.memory = "2048"
+      vbnode.cpus = "2"
+    end
   end
 
   # Create a forwarded port mapping which allows access to a specific port

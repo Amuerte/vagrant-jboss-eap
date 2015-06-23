@@ -1,0 +1,10 @@
+---
+# This playbook deploys a simple standalone JBoss server. 
+
+- hosts: fedora_jboss
+  user: vagrant
+  remote_user: vagrant
+  sudo: true
+
+  roles:
+    - common
